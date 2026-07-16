@@ -5,7 +5,8 @@
 
 
 
-ParsedInput orderCreate(std::string line){
+ParsedInput orderCreate(std::string line)
+{
 
     std::istringstream iss(line);
     std::string command;
@@ -14,7 +15,7 @@ ParsedInput orderCreate(std::string line){
     int price;
     int quantity;
 
-    iss >> command >> id >> side >> price >> quantity;
+    iss >> command >> side >> price >> quantity;
     
 
     Order orderInput;
@@ -24,7 +25,8 @@ ParsedInput orderCreate(std::string line){
 
     ParsedInput completedOrder;
 
-    if (command == "ADD"){
+    if (command == "ADD")
+    {
         Command orderType = Command::add;
         completedOrder.command = orderType;
     }
@@ -34,13 +36,15 @@ ParsedInput orderCreate(std::string line){
         completedOrder.command = orderType;
     }
 
-    if (side == "BUY"){
+    if (side == "BUY")
+    {
         Side side = Side::buy;
-        orderInput.side = side;
+        completedOrder.side = side;
     }
-    else{
+    else
+    {
         Side side = Side::sell;
-        orderInput.side = side;
+        completedOrder.side = side;
     }
   
     completedOrder.orderData = orderInput;
@@ -48,13 +52,60 @@ ParsedInput orderCreate(std::string line){
     return completedOrder;
 };
 
-class OrderBook{
+class OrderBook
+{
     public:
     private:
+        std::vector<Order> bids;
+        std::vector<Order> asks;
+
         void addOrder(ParsedInput completedOrder){
+            if (completedOrder.command == Command::add){
+                if (completedOrder.side == Side::buy){
+                    bids.push_back(completedOrder.orderData);
+                }
+                else if (completedOrder.side == Side::sell){
+                    asks.push_back(completedOrder.orderData);
+                };
+            };  
+        };
+
+        void removeOrder(ParsedInput completedOrder)
+        {
+            if (completedOrder.command == Command::remove)
+            {
+                int orderId = completedOrder.orderData.orderId;
+
+                if (completedOrder.side == Side::buy)
+                {
+                    for(int i = 0; i< bids.size(); i++)
+                    {
+                        bids.begin() + i;
+                        if(bids[i].orderId == orderId)
+                        {
+                            bids.erase(bids.begin() + i);
+                            break;
+                        };
+                    };
+                };
+                if (completedOrder.side == Side::sell)
+                {
+                    for(int i = 0; i< asks.size(); i++)
+                    {
+                        asks.begin() + i;
+                        if(asks[i].orderId == orderId)
+                        {
+                            asks.erase(asks.begin() + i);
+                            break;
+                        };
+                    };    
+
+                };
+
             
+            };
+           
+        };    
 
+};  
 
-
-        }
-};
