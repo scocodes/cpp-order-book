@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(order_book
     main.cpp
+    src/OrderBook.cpp
 )
 
 target_include_directories(order_book

@@ -18,3 +18,19 @@ struct ParsedInput
     Command command;
 };
 
+class OrderBook
+{
+    public:
+        void addOrder(const std::string& line);
+        bool removeOrder(const std::string& line);
+        void print(std::string line);
+
+
+    private:
+        ParsedInput orderCreate(const std::string& line);
+
+        std::vector<Order> bids;
+        std::vector<Order> asks;
+    
+};
+
