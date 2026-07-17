@@ -21,13 +21,15 @@ struct ParsedInput
 class OrderBook
 {
     public:
-        void addOrder(const std::string& line);
-        bool removeOrder(const std::string& line);
+        
         void print(std::string line);
+        void OrderBook::orderOrder();
 
 
     private:
         ParsedInput orderCreate(const std::string& line);
+        void processOrder(const std::string& line);
+        std::string getLine();
 
         std::vector<Order> bids;
         std::vector<Order> asks;
