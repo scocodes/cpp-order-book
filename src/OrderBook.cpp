@@ -53,28 +53,58 @@ void OrderBook::processOrder(const std::string& line)
 
 // Make orderId the input and then print function understands what to ouput 
 
-void OrderBook::print(std::string line)
+void OrderBook::printOrder(const int orderId)
 {
-    if (line == "BIDS")
+    for(int i = 0; i < bids.size(); i++)
+    {
+        if(bids[i].orderId = orderId)
+        {
+            std::cout << "You ordered: " << "\n" <<
+            bids[i].orderId << " " << bids[i].quantity << " " << bids[i].price << "\n";
+            break;
+        }
+    }
+    for(int i = 0; i < asks.size(); i++)
+    {
+        if(asks[i].orderId = orderId)
+        {
+            std::cout << "You want to sell: " << "\n" <<
+            asks[i].orderId << " " << asks[i].quantity << " " << asks[i].price << "\n";
+            break;
+        }
+    }
+}
+
+void OrderBook::printAll(std::string& type)
+{
+    if(type == "BIDS")
     {
         for(int i = 0; i < bids.size(); i++)
         {
-            std::cout << bids[i].orderId << " " << bids[i].quantity << " " << bids[i].price << "\n";
+            std::cout << "BIDS: " << "\n" << bids[i].orderId << " " << bids[i].price << " " << bids[i].quantity << "\n";
         }
-
     }
-    else if (line == "ASKS")
+    else if (type == "ASKS")
     {
         for(int i = 0; i < asks.size(); i++)
         {
-            std::cout << asks[i].orderId << " " << asks[i].quantity << " " << asks[i].price << "\n";
+            std::cout << "ASKS: " << "\n" << bids[i].orderId << " " << bids[i].price << " " << bids[i].quantity << "\n";
+        }  
+    }
+    else if (type == "ALL")
+    {
+        for(int i = 0; i < bids.size(); i++)
+        {
+            std::cout << "BIDS: " << "\n" << bids[i].orderId << " " << bids[i].price << " " << bids[i].quantity << "\n";
         }
-
+        for(int i = 0; i < asks.size(); i++)
+        {
+            std::cout << "ASKS: " << "\n" << bids[i].orderId << " " << bids[i].price << " " << bids[i].quantity << "\n";
+        }  
     }
 }
       
 
-// Change function so that a remove command doesn't need to have price and quantity 
 ParsedInput OrderBook::orderCreate(const std::string& line)
 {
     std::istringstream iss(line);
@@ -87,7 +117,7 @@ ParsedInput OrderBook::orderCreate(const std::string& line)
     ParsedInput completedOrder;
 
     iss >> command;
-    
+
     if (command == "ADD")
     {
         iss >> command >> id >> side >> price >> quantity;
@@ -117,22 +147,22 @@ ParsedInput OrderBook::orderCreate(const std::string& line)
         completedOrder.command = orderType;
     }
 
-    
-
     completedOrder.orderData = orderInput;
-    
     return completedOrder;
 }
 
 void OrderBook::orderOrder()
 {
-
+    while(true)
+    {
     std::cout << "Please input your new order: " << "\n";
     std::string newOrder = getLine();
     processOrder(newOrder);
-    print("BIDS");
-    print("ASKS");
-
+    if(newOrder.empty())
+    {
+        false;
+    }
+    }
 }
 
 std::string OrderBook::getLine()

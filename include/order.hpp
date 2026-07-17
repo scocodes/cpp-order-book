@@ -22,8 +22,9 @@ class OrderBook
 {
     public:
         
-        void print(std::string line);
+        void printOrder(const int orderId);
         void OrderBook::orderOrder();
+        void OrderBook::printAll(std::string& type);
 
 
     private:
