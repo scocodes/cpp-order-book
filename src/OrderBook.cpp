@@ -83,37 +83,41 @@ ParsedInput OrderBook::orderCreate(const std::string& line)
     std::string side;
     int price;
     int quantity;
-
-    iss >> command >> id >> side >> price >> quantity;
-    
     Order orderInput;
-    orderInput.orderId = id;
-    orderInput.price = price;
-    orderInput.quantity = quantity;
-
     ParsedInput completedOrder;
 
+    iss >> command;
+    
     if (command == "ADD")
     {
+        iss >> command >> id >> side >> price >> quantity;
+        orderInput.orderId = id;
+        orderInput.price = price;
+        orderInput.quantity = quantity;
+
         Command orderType = Command::add;
         completedOrder.command = orderType;
+        if (side == "BUY")
+        {
+        Side side = Side::buy;
+        completedOrder.side = side;
+        }
+        else if (side == "SELL")
+        {
+            Side side = Side::sell;
+            completedOrder.side = side;
+        }
     }
 
     else if(command == "REMOVE"){
+        iss >> command >> id;
+        orderInput.orderId = id;
+
         Command orderType = Command::remove;
         completedOrder.command = orderType;
     }
 
-    if (side == "BUY")
-    {
-        Side side = Side::buy;
-        completedOrder.side = side;
-    }
-    else if (side == "SELL")
-    {
-        Side side = Side::sell;
-        completedOrder.side = side;
-    }
+    
 
     completedOrder.orderData = orderInput;
     
