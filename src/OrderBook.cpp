@@ -237,74 +237,97 @@ bool OrderBook::inputFormat(std::string input)
 // trade execution, take quantity from taker and maker, if equal delete order, if unequal update quantities as so
 // resort orders
 
-void OrderBook::matchOrder(Order& orderInput)
+void OrderBook::matchOrder(Order& orderInput, Side orderSide)
 {
-    std::sort(bids.begin(), bids.end(), comparisonBuy);
-    std::sort(asks.begin(), asks.end(), comparisonSell);
-
-    // Buy
-
-    for(int i = 0; i < asks.size(); i++)
+    pushAndSort();
+    if(orderSide == Side::buy)
     {
-        if(orderInput.price >= asks[i].price && orderInput.quantity > 0)
-        {
-            if(orderInput.quantity >= asks[i].quantity)
+        for(int i = 0; i < asks.size(); i++)
             {
-                orderInput.quantity -= asks[i].quantity;
-                if(orderInput.quantity > 0)
+                if(orderInput.price >= asks[i].price && orderInput.quantity > 0)
                 {
-                    std::cout << "Order: " << asks[i].orderId << "has been fufilled. " << "\n";
-                }
-                else
-                {
-                    std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-                    break;
-                }
+                    if(orderInput.quantity >= asks[i].quantity)
+                    {
+                        orderInput.quantity -= asks[i].quantity;
+                        ask[i].push_back();
+                        if(orderInput.quantity > 0)
+                        {
+                            std::cout << "Order: " << asks[i].orderId << "has been fufilled. " << "\n";
+                        }
+                        else
+                        {
+                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                            break;
+                        }
 
+                    }
+                    else if(asks[i].quantity > orderInput.quantity)
+                    {
+                        orderInput.quantity -= asks[i].quantity;
+                        std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                    }
+                }
             }
-            else if(asks[i].quantity > orderInput.quantity)
-            {
-                orderInput.quantity -= asks[i].quantity;
-                std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-            }
-        }
     }
-
-    // Sell
-
-    for(int i = 0; i < bids.size(); i++)
+    if(orderSide == Side::sell)
     {
-        if(orderInput.price <= bids[i].price && orderInput.quantity > 0)
-        {
-            if(orderInput.quantity >= bids[i].quantity)
+        for(int i = 0; i < bids.size(); i++)
             {
-                orderInput.quantity -= bids[i].quantity;
-                
-                if(orderInput.quantity > 0)
+                if(orderInput.price <= bids[i].price && orderInput.quantity > 0)
                 {
-                    std::cout << "Order: " << bids[i].orderId << "has been fufilled. " << "\n";
-                }
-                else
-                {
-                    std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-                    break;
-                }
+                    if(orderInput.quantity >= bids[i].quantity)
+                    {
+                        orderInput.quantity -= bids[i].quantity;
+                        bids[i].push_back();
+                        
+                        if(orderInput.quantity > 0)
+                        {
+                            std::cout << "Order: " << bids[i].orderId << "has been fufilled. " << "\n";
+                        }
+                        else
+                        {
+                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                            break;
+                        }
 
+                    }
+                    else if(bids[i].quantity > orderInput.quantity)
+                    {
+                        orderInput.quantity -= bids[i].quantity;
+                        std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                    }
+                }
             }
-            else if(bids[i].quantity > orderInput.quantity)
-            {
-                orderInput.quantity -= bids[i].quantity;
-                std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-            }
-        }
     }
-
-
-
+    pushAndSort();
 }
 void OrderBook::pushAndSort()
 {
+    for(int i = bids.size(); i > 0; i==)
+    {
+        if(bids[i].quantity <= 0)
+        {
+            bids.erase(bids.end() - i);
+        }
+        else
+        {
+            break;
+        }
+    }
+    for(int i = asks.size(); i > 0; i==)
+    {
+        if(asks[i].quantity <= 0)
+        {
+            asks.erase(asks.end() - i);
+        }
+        else
+        {
+            break;
+        }
+    }
 
+    std::sort(bids.begin(), bids.end(), comparisonBuy);
+    std::sort(asks.begin(), asks.end(), comparisonSell);
 }
 bool OrderBook::comparisonBuy(const Order& a, const Order& b)
 {

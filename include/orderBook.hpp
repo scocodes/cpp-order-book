@@ -3,6 +3,7 @@
 
 enum class Side{buy = 0, sell = 1};
 enum class Command{add = 0, remove = 1};
+enum class OrderType{market = 0, limit = 1};
 
 struct Order
 { 
@@ -16,6 +17,7 @@ struct ParsedInput
     Order orderData;
     Side side;
     Command command;
+    OrderType orderType;
 };
 
 class OrderBook
