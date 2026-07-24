@@ -108,6 +108,7 @@ ParsedInput OrderBook::orderCreate(const std::string& line)
 {
     std::istringstream iss(line);
     std::string command;
+    std::string orderType;
     int id;
     std::string side;
     int price;
@@ -119,11 +120,20 @@ ParsedInput OrderBook::orderCreate(const std::string& line)
 
     if (command == "ADD")
     {
-        iss >> id >> side >> price >> quantity;
+        iss >> id >> side >> orderType >> price >> quantity;
         orderInput.orderId = id;
         orderInput.price = price;
         orderInput.quantity = quantity;
-
+        if (orderType == "LIMIT")
+        {
+            OrderType tyOrd = OrderType::limit;
+        }
+        else if (orderType == "MARKET")
+        {
+            OrderType tyOrd = OrderType::market;
+        }
+    
+        completedOrder.orderType = tyOrd;
         Command orderType = Command::add;
         completedOrder.command = orderType;
         if (side == "BUY")
@@ -191,6 +201,7 @@ bool OrderBook::inputFormat(std::string input)
     std::string command;
     int id;
     std::string side;
+    std::string orderType;
     int price;
     int quantity;
     std::string extra;
@@ -198,16 +209,16 @@ bool OrderBook::inputFormat(std::string input)
     iss >> command;
     if (command == "ADD")
     {
-        if(!(iss >> id >> side >> price >> quantity))
+        if(!(iss >> id >> side >> price >> orderType >> quantity))
         {
             std::cout << "Missing Field or Incorrect Order" << "\n";
             return false;
         }
-        else if(iss >> id >> side >> price >> quantity >> extra)
+        else if(iss >> id >> side >> price >> orderTyp >> quantity >> extra)
         {
             return false;
         }
-        else if(iss >> id >> side >> price >> quantity)
+        else if(iss >> id >> side >> price >> orderType >> quantity)
         {
             return true;
         }
@@ -231,74 +242,132 @@ bool OrderBook::inputFormat(std::string input)
     }
 }
 
-// What does order book need to do? Assuming an input of an order, needs to understand what the type of order is
-// Then it needs to search for the lowest asks or the highest bid price, if the right trade exists, low enough ask or high
-// enough bid, execute trade
-// trade execution, take quantity from taker and maker, if equal delete order, if unequal update quantities as so
-// resort orders
 
-void OrderBook::matchOrder(Order& orderInput, Side orderSide)
+// Add in the functions for market and limit order
+// A limit order doesn't exectute unless the price reaches the asks/sell price 
+// A market order sells/buys at the closest market price 
+// Understand more about modifying variables and when to modify the address and when to modify the variable?
+
+
+void OrderBook::matchOrder(ParsedInput& order2Match)
 {
+    Order& orderInput = order2Match.orderData;
+    Side orderSide = order2Match.side;
+    OrderType& oType = order2Match.orderType;
+
     pushAndSort();
-    if(orderSide == Side::buy)
-    {
-        for(int i = 0; i < asks.size(); i++)
-            {
-                if(orderInput.price >= asks[i].price && orderInput.quantity > 0)
-                {
-                    if(orderInput.quantity >= asks[i].quantity)
-                    {
-                        orderInput.quantity -= asks[i].quantity;
-                        ask[i].push_back();
-                        if(orderInput.quantity > 0)
-                        {
-                            std::cout << "Order: " << asks[i].orderId << "has been fufilled. " << "\n";
-                        }
-                        else
-                        {
-                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-                            break;
-                        }
 
-                    }
-                    else if(asks[i].quantity > orderInput.quantity)
+    
+    if(oType == OrderType::limit)
+    {
+        if(orderSide == Side::buy)
+        {
+            for(int i = 0; i < asks.size(); i++)
+                {
+                    if(orderInput.price >= asks[i].price && orderInput.quantity > 0)
                     {
-                        orderInput.quantity -= asks[i].quantity;
-                        std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                        if(orderInput.quantity >= asks[i].quantity)
+                        {
+                            orderInput.quantity -= asks[i].quantity;
+                            ask[i].push_back();
+                            if(orderInput.quantity > 0)
+                            {
+                                std::cout << "Order: " << asks[i].orderId << "has been fufilled. " << "\n";
+                            }
+                            else
+                            {
+                                std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                                break;
+                            }
+
+                        }
+                        else if(asks[i].quantity > orderInput.quantity)
+                        {
+                            orderInput.quantity -= asks[i].quantity;
+                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                        }
                     }
                 }
-            }
-    }
-    if(orderSide == Side::sell)
-    {
-        for(int i = 0; i < bids.size(); i++)
-            {
-                if(orderInput.price <= bids[i].price && orderInput.quantity > 0)
+        }
+        
+        else if(orderSide == Side::sell)
+        {
+            for(int i = 0; i < bids.size(); i++)
                 {
-                    if(orderInput.quantity >= bids[i].quantity)
+                    if(orderInput.price <= bids[i].price && orderInput.quantity > 0)
                     {
-                        orderInput.quantity -= bids[i].quantity;
-                        bids[i].push_back();
-                        
-                        if(orderInput.quantity > 0)
+                        if(orderInput.quantity >= bids[i].quantity)
                         {
-                            std::cout << "Order: " << bids[i].orderId << "has been fufilled. " << "\n";
-                        }
-                        else
-                        {
-                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
-                            break;
-                        }
+                            orderInput.quantity -= bids[i].quantity;
+                            bids[i].push_back();
+                            
+                            if(orderInput.quantity > 0)
+                            {
+                                std::cout << "Order: " << bids[i].orderId << "has been fufilled. " << "\n";
+                            }
+                            else
+                            {
+                                std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                                break;
+                            }
 
-                    }
-                    else if(bids[i].quantity > orderInput.quantity)
-                    {
-                        orderInput.quantity -= bids[i].quantity;
-                        std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                        }
+                        else if(bids[i].quantity > orderInput.quantity)
+                        {
+                            orderInput.quantity -= bids[i].quantity;
+                            std::cout << "Order: " << orderInput.orderId << "has been fufilled. " << "\n";
+                        }
                     }
                 }
-            }
+        }
     }
+
+    else if (oType == OrderType::market)
+    {
+        if(orderSide == Side::buy)
+        {
+            int avrPrices = 0;
+            int avrOrders = 0;
+            int avrOrderQuant = 0;
+
+            for(int i = 0; i < asks.size(); i++)
+            {
+                if(orderInput.quantity >= asks.quantity[i])
+                {
+                    int avrOrderQuant += asks.quantity[i];
+
+                    orderInput.quantity -= asks.quantity[i];
+                    if(orderInput.quantity > 0)
+                    {
+                        std::cout << "Order: " << asks[i].orderId << "has been fufilled. " << "\n";
+                        prices += avrOrderQuant * asks[i].price;
+                        orders ++;
+                    }
+
+                    else if(orders > 1)
+                    {
+                        int avrPrice = prices / orderInput.quantity;
+                        std::cout << "Order: " << orderInput.orderId << "has been fufilled at an average price of: " << avrPrice << "\n";
+                        break;
+                    }
+
+                    else
+                    {
+                        std::cout << "Order: " << orderInput.orderId << "has been fufilled at: " << asks.price[i] << "\n";
+                        break;
+                    }
+                }
+                else if(asks.quantity[i] > orderInput.quantity)
+                {
+                    asks.quantity[i] -= orderInput.quantity;
+                    std::cout << "Order: " << orderInput.orderId << "has been fufilled at: " << asks.price[i] << "\n";
+                    break;
+                }
+            }
+        }
+    
+    }
+
     pushAndSort();
 }
 void OrderBook::pushAndSort()
