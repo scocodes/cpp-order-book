@@ -34,10 +34,10 @@ class OrderBook
         void processOrder(const std::string& line);
         std::string getLine();
         bool inputFormat(std::string input);
-        void OrderBook::matchOrder(Order& orderInput);
+        void OrderBook::matchOrder(ParsedInput& order2Match);
         bool comparisonBuy(const Order& a, const Order& b);
         bool comparisonSell(const Order& a, const Order& b);
-        void OrderBook::pushAndSort();
+        void OrderBook::eraseAndSort();
 
         std::vector<Order> bids;
         std::vector<Order> asks;
