@@ -24,17 +24,17 @@ class OrderBook
 {
     public:
         
-        void printOrder(const int orderId);
-        void orderOrder();
-        void printAll(const std::string& type);
+        void printOrder(const int orderId) const;
+        void mainOrder();
+        void printAll(const std::string& type) const;
 
 
     private:
         ParsedInput orderCreate(const std::string& line);
-        void processOrder(const std::string& line);
+        void processOrder(ParsedInput& newOrder);
         std::string getLine();
-        bool inputFormat(std::string input);
-        bool matchOrder(std::string& inputOrder);
+        bool inputFormat(const std::string& input);
+        bool matchOrder(ParsedInput& order2Match);
         bool comparisonBuy(const Order& a, const Order& b);
         bool comparisonSell(const Order& a, const Order& b);
         void eraseAndSort();
