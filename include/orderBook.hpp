@@ -11,6 +11,7 @@ struct Order
     int price;
     int quantity;
     int orderId;
+    std::chrono::system_clock::time_point timestamp;
 };
 
 struct ParsedInput
@@ -40,6 +41,7 @@ class OrderBook
 
         std::vector<Order> bids;
         std::vector<Order> asks;
+        int allocatedOrderId{1};
     
 };
 

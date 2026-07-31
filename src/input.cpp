@@ -16,8 +16,8 @@ bool Input::inputFormat(const std::string& input)
 {
     std::istringstream iss(input);
     std::string command;
-    int id{};
     std::string side;
+    int id{};
     std::string orderTypeText;
     int price{};
     int quantity{};
@@ -26,7 +26,7 @@ bool Input::inputFormat(const std::string& input)
     iss >> command;
     if (command == "ADD")
     {
-        if(!(iss >> id >> side >> orderTypeText >> price >> quantity))
+        if(!(iss >> side >> orderTypeText >> price >> quantity))
         {
             std::cout << "Missing Field or Incorrect Order" << "\n";
             return false;
@@ -35,6 +35,9 @@ bool Input::inputFormat(const std::string& input)
         {
             return false;
             // Understand how iss works better
+        }
+        else{
+            return true;
         }
     }
 
