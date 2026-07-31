@@ -22,6 +22,15 @@ struct ParsedInput
     OrderType orderType;
 };
 
+struct TradeHistory
+{
+    int quantity;
+    int buyerId;
+    int sellerId;
+    int salePrice;
+    std::chrono::system_clock::time_point timeOfSale;
+};
+
 class OrderBook
 {
     public:
@@ -37,10 +46,11 @@ class OrderBook
         void removeOrder(ParsedInput& order2Remove);
         bool matchOrder(ParsedInput& order2Match);
         void eraseAndSort();
-
+        void recordTrade(int quantity, int salePrice, int buyerId, int sellerId, Side side);
 
         std::vector<Order> bids;
         std::vector<Order> asks;
+        std::vector<TradeHistory> tradeHistory;
         int allocatedOrderId{1};
     
 };
