@@ -1,9 +1,10 @@
 #pragma once
-#include <iostream>
+#include <string>
+#include <vector>
 
-enum class Side{buy = 0, sell = 1};
-enum class Command{add = 0, remove = 1};
-enum class OrderType{market = 0, limit = 1};
+enum class Side{none, buy = 0, sell = 1};
+enum class Command{none, add = 0, remove = 1};
+enum class OrderType{none, market = 0, limit = 1};
 
 struct Order
 { 
@@ -24,21 +25,17 @@ class OrderBook
 {
     public:
         
-        void printOrder(const int orderId) const;
         void mainOrder();
+        void printOrder(const int orderId) const;
         void printAll(const std::string& type) const;
 
 
     private:
-        ParsedInput orderCreate(const std::string& line);
         void processOrder(ParsedInput& newOrder);
-        std::string getLine();
-        bool inputFormat(const std::string& input);
+        void addOrder(ParsedInput& order2Add);
+        void removeOrder(ParsedInput& order2Remove);
         bool matchOrder(ParsedInput& order2Match);
-        bool comparisonBuy(const Order& a, const Order& b);
-        bool comparisonSell(const Order& a, const Order& b);
         void eraseAndSort();
-        bool quantitySort(const Order& a, const Order& b);
 
 
         std::vector<Order> bids;

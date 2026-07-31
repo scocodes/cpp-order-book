@@ -6,7 +6,7 @@ int main()
 {
     // "Format: ADD 101 BUY 10525 50"
     OrderBook book;
-    book.orderOrder();
+    book.mainOrder();
 
     std::string asks = "ASKS";
     std::string bids = "BIDS";
