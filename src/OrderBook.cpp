@@ -9,7 +9,7 @@ void OrderBook::processOrder(ParsedInput& completedOrder)
 { 
     if (completedOrder.command == Command::add)
     {
-        order2Add.orderData.orderId = allocatedOrderId;
+        completedOrder.orderData.orderId = allocatedOrderId;
         allocatedOrderId ++;
         addOrder(completedOrder);
     }
@@ -45,18 +45,18 @@ void OrderBook::removeOrder(ParsedInput& order2Remove)
 {
     int orderId = order2Remove.orderData.orderId;
 
-    for(Order& order : bids)
+    for(int i = 0; i < bids.size(); i++)
     {
-        if(order.orderId == orderId)
+        if(bids[i].orderId == orderId)
         {
             bids.erase(bids.begin() + i);
             break;
         }
     }
 
-    for(Order& order : asks)
+    for(int i = 0; i < asks.size(); i++)
     {
-        if(order.orderId == orderId)
+        if(asks[i].orderId == orderId)
         {
             asks.erase(asks.begin() + i);
             break;
@@ -72,7 +72,7 @@ void OrderBook::mainOrder()
         std::cout << "Please input your new order: " << "\n";
         std::string newOrder = Input::getLine();
 
-        if (!inputFormat(newOrder))
+        if (!Input::inputFormat(newOrder))
         {
             continue;
         }
@@ -143,7 +143,7 @@ bool OrderBook::matchOrder(ParsedInput& order2Match)
                     {
                         if(orderInput.quantity >= existingOrder.quantity)
                         {
-                            recordTrade(existingOrder.quantity, existingOrder.price, existingOrder.orderId, orderInput.orderId)
+                            recordTrade(existingOrder.quantity, existingOrder.price, existingOrder.orderId, orderInput.orderId);
                             orderInput.quantity -= existingOrder.quantity;
                             existingOrder.quantity = 0;
 
@@ -238,8 +238,7 @@ bool OrderBook::matchOrder(ParsedInput& order2Match)
                 if(orderInput.quantity >= existingOrder.quantity)
                 {
                     avrOrderQuant += existingOrder.quantity;
-                    recordTrade(existingOrder.quantity, existingOrder.price, exitingOrder.orderId, orderInput.orderId);
-
+                    recordTrade(existingOrder.quantity, existingOrder.price, existingOrder.orderId, orderInput.orderId);
                     orderInput.quantity -= existingOrder.quantity;
                     existingOrder.quantity = 0;
 
@@ -265,7 +264,7 @@ bool OrderBook::matchOrder(ParsedInput& order2Match)
                 }
                 else if(existingOrder.quantity > orderInput.quantity)
                 {
-                    recordTrade(orderInput.quantity, existingOrder.price, exitingOrder.orderId, orderInput.orderId);
+                    recordTrade(orderInput.quantity, existingOrder.price, existingOrder.orderId, orderInput.orderId);
                     existingOrder.quantity -= orderInput.quantity;
                     orderInput.quantity = 0;
                     std::cout << "Order: " << orderInput.orderId << "has been fulfilled at: " << existingOrder.price << "\n";
@@ -289,11 +288,11 @@ void OrderBook::eraseAndSort()
     std::sort(bids.begin(), bids.end(), [](const Order& a, const Order& b)
     {
         return a.quantity < b.quantity;
-    })
+    });
         
-    for(Order& order : bids)
+    for(int i = 0; i < bids.size(); i++)
     {
-        if(order.quantity <= 0)
+        if(bids[i].quantity <= 0)
         {
             bids.erase(bids.begin() + i);
         }
@@ -302,8 +301,10 @@ void OrderBook::eraseAndSort()
             break;
         }
     }
-    for(Order& order : asks)
-        if(order.quantity <= 0)
+
+    for(int i = 0; i < bids.size(); i++)
+    {
+        if(asks[i].quantity <= 0)
         {
             asks.erase(asks.begin() + i);
         }
@@ -311,13 +312,15 @@ void OrderBook::eraseAndSort()
         {
             break;
         }
+    }
+
     std::sort(bids.begin(), bids.end(), [](const Order& a, const Order& b)
     {
         if(a.price != b.price)
         {
             return a.price > b.price;
         }
-        return a.timestep < b.timestep;
+        return a.timestamp < b.timestamp;
     });
     std::sort(asks.begin(), asks.end(), [](const Order& a, const Order& b)
     {
@@ -325,18 +328,14 @@ void OrderBook::eraseAndSort()
         {
             return a.price < b.price;
         }
-        return a.timestep < b.timestep;
+        return a.timestamp < b.timestamp;
     });
 }
 
 void OrderBook::recordTrade(int quantity, int salePrice, int buyerId, int sellerId)
 {
-    TradeHistory newTrade{};
-    newTrade.quantity = quantity;
-    newTrade.buyerId = orderId;
-    newTrade.sellerId = orderId;
-    newTrade.salePrice = price;
-    newTrade.timeOfSale = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point timeOfSale = std::chrono::system_clock::now();
+    TradeHistory newTrade(quantity, salePrice, buyerId, sellerId, timeOfSale);
 }
    
 

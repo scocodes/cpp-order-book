@@ -24,11 +24,19 @@ struct ParsedInput
 
 struct TradeHistory
 {
-    int quantity;
-    int buyerId;
-    int sellerId;
-    int salePrice;
-    std::chrono::system_clock::time_point timeOfSale;
+    int quantity{};
+    int buyerId{};
+    int sellerId{};
+    int salePrice{};
+    std::chrono::system_clock::time_point timeOfSale{};
+
+    TradeHistory(int quantity, int salePrice, int buyerId, int sellerId, 
+        std::chrono::system_clock::time_point timeOfSale) 
+    : quantity(quantity), salePrice(salePrice), buyerId(buyerId), sellerId(sellerId),
+    timeOfSale(timeOfSale)
+    {
+    }
+
 };
 
 class OrderBook
@@ -46,10 +54,11 @@ class OrderBook
         void removeOrder(ParsedInput& order2Remove);
         bool matchOrder(ParsedInput& order2Match);
         void eraseAndSort();
-        void recordTrade(int quantity, int salePrice, int buyerId, int sellerId, Side side);
+        void recordTrade(int quantity, int salePrice, int buyerId, int sellerId);
 
         std::vector<Order> bids;
         std::vector<Order> asks;
+        
         std::vector<TradeHistory> tradeHistory;
         int allocatedOrderId{1};
     
